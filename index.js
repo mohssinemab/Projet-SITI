@@ -7,6 +7,8 @@ const operateur = require('./routes/operateur')
 const machine = require('./routes/machine')
 const auth = require('./routes/auth')
 
+require('dotenv').config();
+
 
 connectdb();
 app.use(express.json({extended:false}))

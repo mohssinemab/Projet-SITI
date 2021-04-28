@@ -7,7 +7,7 @@ const connectionParams={
 }
 const connectdb =()=>{ mongoose.connect(process.env.DATABASE,connectionParams)
     .then( () => {
-        console.log('++++++Connected to database ')
+        console.log('++++++ Well connected to database ')
     })
     .catch( (err) => {
         console.error(`Error connecting to the database. \n${err}`);

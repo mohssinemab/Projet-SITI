@@ -19,5 +19,35 @@ exports.addmachine = async (req,res) => {
     res.status(404).send(err.message)
 
     }
-
 };
+
+
+exports.getAllmachine = async (req,res)=>{
+  machine.find((err,docs)=>{
+    if(!err){ res.json(docs)}
+    else{
+      res.status(404).send(err);
+    }
+  });
+};
+
+exports.getusedmachines = async (req,res)=>{
+  machine.find({used:true},(err,docs)=>{
+    if(!err){ res.json(docs)}
+    else{
+      res.status(404).send(err);
+    }
+  });
+};
+
+exports.getunusedmachines = async (req,res)=>{
+  machine.find({used:false},(err,docs)=>{
+    if(!err){ res.json(docs)}
+    else{
+      res.status(404).send(err);
+    }
+  });
+};
+
+
+

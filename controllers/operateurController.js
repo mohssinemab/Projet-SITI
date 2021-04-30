@@ -30,3 +30,44 @@ exports.addoperateur = async (req,res) => {
     }
 
 };
+
+
+exports.getAlloperateur = async (req,res)=>{
+  operateur.find((err,docs)=>{
+    if(!err){ res.json(docs)}
+    else{
+      res.status(404).send(err);
+    }
+  });
+};
+
+exports.getoperateurByUsername= async (req,res)=>{
+  const usern = req.params.username;
+  operateur.findOne({username : usern},(err,doc)=>{
+    if(!err && doc){
+      res.send(doc);
+    }else if(!doc){
+      res.status(404).send("Not found");
+    }else{
+      res.status(404).send(err)
+    }
+  });
+  
+};
+
+// exports.Updateoperateur
+
+exports.deleteoperateur = async (req,res)=>{
+  const usern = req.params.username;
+  operateur.deleteOne({username : usern},(err,doc)=>{
+    if(!err && doc.deletedCount==1 ){
+      console.log(doc);
+      res.send(" Well deleted ");
+    }else{
+      console.log(doc);
+      res.status(404).send("Delete failed")
+      console.log(err)
+    }
+  });
+};
+

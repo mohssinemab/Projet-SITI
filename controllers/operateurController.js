@@ -1,17 +1,21 @@
-
 const operateur = require('../models/operateur');
 const bcrypt = require('bcrypt');
 
 
 
-exports.addoperateur = async (req,res) => {
+exports.addoperateur = async (req, res) => {
 
+  // if (!req.body) {
+  //   return res.status(400).send({
+  //     message: "Aucune donnée reçue"
+  //   });
+  // }
   const salt = await bcrypt.genSalt(10);
 
   let pass = req.body.password;
   pass = await bcrypt.hash(pass, salt);
 
-    let op = new operateur({
+  let op = new operateur({
     username: req.body.username,
     password: pass,
     name: req.body.name,
@@ -19,7 +23,7 @@ exports.addoperateur = async (req,res) => {
   });
 
   try {
-    
+
     let result = await op.save();
     console.log(result);
     res.status(200).send(result)
@@ -27,47 +31,93 @@ exports.addoperateur = async (req,res) => {
     console.log(err.message);
     res.status(404).send(err.message)
 
-    }
+  }
 
 };
 
 
-exports.getAlloperateur = async (req,res)=>{
-  operateur.find((err,docs)=>{
-    if(!err){ res.json(docs)}
-    else{
+exports.getAlloperateur = async (req, res) => {
+  operateur.find((err, docs) => {
+    if (!err) { res.json(docs) }
+    else {
       res.status(404).send(err);
     }
   });
 };
 
-exports.getoperateurByUsername= async (req,res)=>{
+exports.getoperateurByUsername = async (req, res) => {
   const usern = req.params.username;
-  operateur.findOne({username : usern},(err,doc)=>{
-    if(!err && doc){
+  operateur.findOne({ username: usern }, (err, doc) => {
+    if (!err && doc) {
       res.send(doc);
-    }else if(!doc){
+    } else if (!doc) {
       res.status(404).send("Not found");
-    }else{
+    } else {
       res.status(404).send(err)
     }
   });
-  
+
 };
 
-// exports.Updateoperateur
+exports.getoperateurById = async (req, res) => {
+  try{
+  const op= await operateur.findById(req.params.id)
+  if(op){
+    res.json(op);
+  }else(
+    res.status(404).send("Not found")
+  )
 
-exports.deleteoperateur = async (req,res)=>{
-  const usern = req.params.username;
-  operateur.deleteOne({username : usern},(err,doc)=>{
-    if(!err && doc.deletedCount==1 ){
+  }catch(err){
+    res.send(err)
+  }
+
+};
+
+exports.updateoperateur = async (req, res) => {
+
+  const salt = await bcrypt.genSalt(10);
+
+  let pass = req.body.password;
+  console.log("----------- : ",pass);
+  pass = await bcrypt.hash(pass, salt);
+  console.log(" ----------- HASHED PASS : ",pass);
+
+  try{
+    const id = req.params.id;
+    operateur.findByIdAndUpdate(id,{
+      username: req.body.username,
+      password: pass,
+      name: req.body.name,
+  
+    },{ new: true })
+    .then(data=>{
+      if(!data){
+        res.status(404).send({
+          msg: "Not updated, not found"
+        })
+      }else{
+        res.send({
+          msg : "Well updated"
+        })
+      }
+    })
+    
+  }catch(err){
+    res.status(404).send(err)
+  }
+};
+
+exports.deleteoperateur = async (req, res) => {
+  const id = req.params.id;
+  operateur.deleteOne({ _id: id }, (err, doc) => {
+    if (!err && doc.deletedCount == 1) {
       console.log(doc);
       res.send(" Well deleted ");
-    }else{
+    } else {
       console.log(doc);
       res.status(404).send("Delete failed")
       console.log(err)
     }
   });
 };
-

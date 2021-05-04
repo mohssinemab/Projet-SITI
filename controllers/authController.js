@@ -11,7 +11,6 @@ exports.login = (req, res) => {
       console.log(user);
       if (user) {
         console.log(password);
-        console.log("--- pass hashed from DB : ",user.password);
         bcrypt.compare(password, user.password)
           .then(result => {
             console.log(result);
@@ -23,8 +22,8 @@ exports.login = (req, res) => {
                   role: user.role
                 }
               },
-                "Siti",
-                { expiresIn: 36000 });
+              process.env.SIGN,
+                { expiresIn: 10000 });
               return res.status(200).json({
                 message: "login success",
                 token: token

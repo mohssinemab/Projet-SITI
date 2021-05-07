@@ -3,9 +3,6 @@ const bcrypt = require('bcrypt');
 
 
 
-
-
-
 exports.addoperateur = async (req, res) => {
 
 

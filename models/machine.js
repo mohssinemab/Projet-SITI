@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+
 const Machine = new mongoose.Schema({
     factory: {
         type: Number,

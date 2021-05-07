@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 
-const machine = new mongoose.Schema({
+const Machine = new mongoose.Schema({
     factory: {
         type: Number,
         required: true
     },
-    row: {
+    room: {
         type: Number,
         required: true
     },
@@ -13,11 +13,12 @@ const machine = new mongoose.Schema({
         type: Number,
         required: true
     },
-    used:{
+    busy:{
         type:Boolean,
-        required:true
+        default:false,
+        required:false
     },
     
 }, { timestamps: true })
 
-module.exports = mongoose.model('machine', machine);
+module.exports = mongoose.model('Machine', Machine);

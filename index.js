@@ -19,7 +19,7 @@ app.use(cors())
 app.use(morgan('tiny'))
 
 app.use('/manager', isManager, operateur);
-app.use('/machine', authMidd, machine);
+app.use('/machine',authMidd, machine);
 app.use('/auth', auth);
 
 

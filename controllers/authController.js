@@ -1,4 +1,4 @@
-const operateur = require("../models/operateur")
+const Operateur = require("../models/Operateur")
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt')
 
@@ -6,24 +6,26 @@ const bcrypt = require('bcrypt')
 exports.login = (req, res) => {
   const usern = req.body.username;
   const password = req.body.password;
-  operateur.findOne({ username : usern })
+  Operateur.findOne({ username : usern })
     .then(user => {
-      console.log(user);
+      // console.log(user);
       if (user) {
-        console.log(password);
+        // console.log(password);
         bcrypt.compare(password, user.password)
           .then(result => {
             console.log(result);
             if (result) {
               const token = jwt.sign({
                 user: {
+                  id : user._id,
                   username: user.username,
+                  factory: user.factory,
                   name: user.name,
                   role: user.role
                 }
               },
               process.env.SIGN,
-                { expiresIn: 10000 });
+                { expiresIn: 100000 });
               return res.status(200).json({
                 message: "login success",
                 token: token

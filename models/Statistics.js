@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const Statistics = new mongoose.Schema({
-    operation: {
+    shift: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'operation',
         required: true

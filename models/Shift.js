@@ -1,22 +1,32 @@
 const mongoose = require('mongoose');
 
-const operation = new mongoose.Schema({
+const Shift = new mongoose.Schema({
     operateur: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'operateur',
+        ref: 'Operateur',
         required: true
     },
-    machines: [{
+    machine:{
         type: mongoose.Schema.Types.ObjectId,
-        ref : 'machine',
+        ref : 'Machine',
         required: true
-    }],
+    },
     datefin:{
         type: Date,
         default: null,
         required : false
+    },
+    produit:{
+        type : String,
+        required: true
+    },
+    breaktime:{
+        type : Number,
+        default : 0,
+        required:false
+
     }
 }, { timestamps: true })
 
 
-module.exports = mongoose.model('operation', operation);
+module.exports = mongoose.model('Shift', Shift);

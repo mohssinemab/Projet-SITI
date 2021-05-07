@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const operateur = new mongoose.Schema({
+const Operateur = new mongoose.Schema({
     username: {
         type: String,
         unique: true,
@@ -14,6 +14,11 @@ const operateur = new mongoose.Schema({
         type: String,
         required: true
     },
+    factory: {
+        type : Number,
+        default : 1,
+        required : false
+    },
     score: {
         type: Number,
         default:0
@@ -25,4 +30,4 @@ const operateur = new mongoose.Schema({
 }, { timestamps: true })
 
 
-module.exports = mongoose.model('operateur', operateur);
+module.exports = mongoose.model('Operateur', Operateur);

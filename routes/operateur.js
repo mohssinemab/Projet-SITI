@@ -1,13 +1,14 @@
 const express = require('express');
 
 const {addoperateur,getAlloperateur,getoperateurByUsername,deleteoperateur,updateoperateur,getoperateurById} = require('../controllers/operateurController')
-const isManager = require('../middleware/isManager');
 
 const router = express.Router();
 
 router.post('/addoperateur',addoperateur);
 
 router.get('/getAlloperateur', getAlloperateur);
+
+
 
 router.get('/getoperateurByUsername/:username', getoperateurByUsername);
 

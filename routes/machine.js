@@ -1,7 +1,7 @@
 const express = require('express');
 
-const {addmachine,getAllmachine,getusedmachines,getunusedmachines} = require('../controllers/machineController')
-const {addoperation} = require('../controllers/operationController')
+const {addmachine,getAllmachines,getbusymachines,getfreemachines,getmachinesbyroom} = require('../controllers/machineController')
+const {addshift} = require('../controllers/shiftController')
 
 const router = express.Router();
 
@@ -9,14 +9,18 @@ const router = express.Router();
 //Machine
 router.post('/addmachine', addmachine);
 
-router.get('/getallmachine', getAllmachine);
+router.get('/getallmachines', getAllmachines);
 
-router.get('/getusedmachines', getusedmachines);
+router.get('/getbusymachines', getbusymachines);
 
-router.get('/getunusedmachines', getunusedmachines);
+router.get('/getfreemachines', getfreemachines);
+
+router.get('/getmachinesbyroom/:room', getmachinesbyroom);
+
 
 // Operation
-router.post('/addoperation', addoperation);
+router.post('/addshift', addshift);
+
 
 
 

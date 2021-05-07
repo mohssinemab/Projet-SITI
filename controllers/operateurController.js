@@ -1,21 +1,20 @@
-const operateur = require('../models/operateur');
+const Operateur = require('../models/Operateur');
 const bcrypt = require('bcrypt');
+
+
+
 
 
 
 exports.addoperateur = async (req, res) => {
 
-  // if (!req.body) {
-  //   return res.status(400).send({
-  //     message: "Aucune donnée reçue"
-  //   });
-  // }
+
   const salt = await bcrypt.genSalt(10);
 
   let pass = req.body.password;
   pass = await bcrypt.hash(pass, salt);
 
-  let op = new operateur({
+  let op = new Operateur({
     username: req.body.username,
     password: pass,
     name: req.body.name,
@@ -37,7 +36,7 @@ exports.addoperateur = async (req, res) => {
 
 
 exports.getAlloperateur = async (req, res) => {
-  operateur.find((err, docs) => {
+  Operateur.find((err, docs) => {
     if (!err) { res.json(docs) }
     else {
       res.status(404).send(err);
@@ -47,7 +46,7 @@ exports.getAlloperateur = async (req, res) => {
 
 exports.getoperateurByUsername = async (req, res) => {
   const usern = req.params.username;
-  operateur.findOne({ username: usern }, (err, doc) => {
+  Operateur.findOne({ username: usern }, (err, doc) => {
     if (!err && doc) {
       res.send(doc);
     } else if (!doc) {
@@ -61,7 +60,7 @@ exports.getoperateurByUsername = async (req, res) => {
 
 exports.getoperateurById = async (req, res) => {
   try{
-  const op= await operateur.findById(req.params.id)
+  const op= await Operateur.findById(req.params.id)
   if(op){
     res.json(op);
   }else(
@@ -85,7 +84,7 @@ exports.updateoperateur = async (req, res) => {
 
   try{
     const id = req.params.id;
-    operateur.findByIdAndUpdate(id,{
+    Operateur.findByIdAndUpdate(id,{
       username: req.body.username,
       password: pass,
       name: req.body.name,
@@ -110,7 +109,7 @@ exports.updateoperateur = async (req, res) => {
 
 exports.deleteoperateur = async (req, res) => {
   const id = req.params.id;
-  operateur.deleteOne({ _id: id }, (err, doc) => {
+  Operateur.deleteOne({ _id: id }, (err, doc) => {
     if (!err && doc.deletedCount == 1) {
       console.log(doc);
       res.send(" Well deleted ");

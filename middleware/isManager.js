@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-// const sign = process.env.SIGN;
 
 module.exports = function (req, res, next) {
   //  Getting the token
@@ -11,9 +10,8 @@ console.log(token);
   }
 
   try {
-    // console.log(" ======== siiiiiign  :",sign);
     const decoded = jwt.verify(token,'Siti');
-    console.log("--decodedtoken : ",decoded);
+    // console.log("--decodedtoken : ",decoded);
     if(decoded.user.role!=='manager'){
         return res.status(401).json({
             msg:"Sorry, you're not a Manager"

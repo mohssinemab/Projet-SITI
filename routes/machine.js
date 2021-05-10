@@ -1,6 +1,6 @@
 const express = require('express');
 
-const {addmachine,getAllmachines,getbusymachines,getfreemachines,getmachinesbyroom} = require('../controllers/machineController')
+const {addmachine,getAllmachines,getbusymachines,getfreemachines,getmachinesbyroom,getmachine} = require('../controllers/machineController')
 const {addshift} = require('../controllers/shiftController')
 
 const router = express.Router();
@@ -10,6 +10,8 @@ const router = express.Router();
 router.post('/addmachine', addmachine);
 
 router.get('/getallmachines', getAllmachines);
+
+router.get('/getmachine', getmachine);
 
 router.get('/getbusymachines', getbusymachines);
 

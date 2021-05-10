@@ -14,7 +14,7 @@ exports.addmachine = async (req,res) => {
     } else if (!doc) {
       
     try {
-    let result =  mach.save();  
+    let result = mach.save();  
     console.log(result);
     res.status(200).send(result)
     }catch (err) {
@@ -46,13 +46,27 @@ exports.getmachinesbyroom = async (req, res) => {
 
 
 exports.getAllmachines = async (req,res)=>{
-  Machine.find((err,docs)=>{
+  Machine.find({ factory: req.user.factory },(err,docs)=>{
     if(!err){ res.json(docs)}
     else{
       res.status(404).send(err);
     }
   });
 };
+
+exports.getmachine = async (req,res)=>{
+    try{
+    const mach= await Machine.findById(req.params.id)
+    if(mach){
+      res.json(mach);
+    }else(
+      res.status(404).send("Not found")
+    )
+    }catch(err){
+      res.send(err)
+    }
+  
+  };
 
 exports.getfreemachines = async (req,res)=>{
   Machine.find({busy:false},(err,docs)=>{

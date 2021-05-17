@@ -4,8 +4,7 @@ const bcrypt = require('bcrypt');
 
 
 exports.addoperateur = async (req, res) => {
-
-
+  
   const salt = await bcrypt.genSalt(10);
 
   let pass = req.body.password;
@@ -14,12 +13,9 @@ exports.addoperateur = async (req, res) => {
   let op = new Operateur({
     username: req.body.username,
     password: pass,
-    name: req.body.name,
-
+    name: req.body.name
   });
-
   try {
-
     let result = await op.save();
     console.log(result);
     res.status(200).send(result)
@@ -33,7 +29,7 @@ exports.addoperateur = async (req, res) => {
 
 
 exports.getAlloperateur = async (req, res) => {
-  Operateur.find((err, docs) => {
+  Operateur.find({ role: "operateur" }, (err, docs) => {
     if (!err) { res.json(docs) }
     else {
       res.status(404).send(err);
@@ -56,15 +52,15 @@ exports.getoperateurByUsername = async (req, res) => {
 };
 
 exports.getoperateurById = async (req, res) => {
-  try{
-  const op= await Operateur.findById(req.params.id)
-  if(op){
-    res.json(op);
-  }else(
-    res.status(404).send("Not found")
-  )
+  try {
+    const op = await Operateur.findById(req.params.id)
+    if (op) {
+      res.json(op);
+    } else (
+      res.status(404).send("Not found")
+    )
 
-  }catch(err){
+  } catch (err) {
     res.send(err)
   }
 
@@ -73,33 +69,28 @@ exports.getoperateurById = async (req, res) => {
 exports.updateoperateur = async (req, res) => {
 
   const salt = await bcrypt.genSalt(10);
-
   let pass = req.body.password;
-  console.log("----------- : ",pass);
   pass = await bcrypt.hash(pass, salt);
-  console.log(" ----------- HASHED PASS : ",pass);
-
-  try{
+  try {
     const id = req.params.id;
-    Operateur.findByIdAndUpdate(id,{
+    Operateur.findByIdAndUpdate(id, {
       username: req.body.username,
       password: pass,
-      name: req.body.name,
-  
-    },{ new: true })
-    .then(data=>{
-      if(!data){
-        res.status(404).send({
-          msg: "Not updated, not found"
-        })
-      }else{
-        res.send({
-          msg : "Well updated"
-        })
-      }
-    })
-    
-  }catch(err){
+      name: req.body.name
+    }, { new: true })
+      .then(data => {
+        if (!data) {
+          res.status(404).send({
+            msg: "Not updated, not found"
+          })
+        } else {
+          res.send({
+            msg: "Well updated"
+          })
+        }
+      })
+
+  } catch (err) {
     res.status(404).send(err)
   }
 };

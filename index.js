@@ -8,6 +8,8 @@ const machine = require('./routes/machine')
 const auth = require('./routes/auth')
 const authMidd = require('./middleware/authMidd')
 const isManager = require('./middleware/isManager')
+const {verifytoken} = require('./controllers/verifytokenController')
+const router = express.Router();
 
 
 require('dotenv').config();
@@ -21,8 +23,9 @@ app.use(morgan('tiny'))
 app.use('/manager', isManager, operateur);
 app.use('/machine',authMidd, machine);
 app.use('/auth', auth);
+app.get('/verifytoken',verifytoken)
 
 
-var port = process.env.PORT || 5002;
+var port = process.env.PORT || 5002 ;
 app.listen(port, console.log(`Server is listening on port ${port}`) )
 

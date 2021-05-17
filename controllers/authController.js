@@ -25,7 +25,7 @@ exports.login = (req, res) => {
                 }
               },
               process.env.SIGN,
-                { expiresIn: 100000 });
+                {  });
               return res.status(200).json({
                 message: "login success",
                 token: token

@@ -44,12 +44,21 @@ exports.getmachinesbyroom = async (req, res) => {
 
 
 exports.getAllmachines = async (req, res) => {
-  Machine.find({ factory: req.user.factory }, (err, docs) => {
-    if (!err) { res.json(docs) }
-    else {
-      res.status(404).send(err);
-    }
-  });
+  if (req.user.role == "manager") {
+    Machine.find( (err, docs) => {
+      if (!err) { res.json(docs) }
+      else {
+        res.status(404).send(err);
+      }
+    });
+  } else {
+    Machine.find({ factory: req.user.factory }, (err, docs) => {
+      if (!err) { res.json(docs) }
+      else {
+        res.status(404).send(err);
+      }
+    });
+  }
 };
 
 exports.getmachine = async (req, res) => {
@@ -85,7 +94,7 @@ exports.getfreemachines = async (req, res) => {
 //         console.log("------");
 //         data=[...data,d];
 //       })
-      
+
 //       console.log("++++++++++++++++");
 //       console.log(data);
 //       res.json(docs)

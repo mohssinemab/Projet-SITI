@@ -1,6 +1,6 @@
 const Operateur = require('../models/Operateur');
 const bcrypt = require('bcrypt');
-
+const jwt = require('jsonwebtoken');
 
 
 exports.addoperateur = async (req, res) => {
@@ -9,6 +9,7 @@ exports.addoperateur = async (req, res) => {
 
   let pass = req.body.password;
   pass = await bcrypt.hash(pass, salt);
+  let p = bcrypt.t
 
   let op = new Operateur({
     username: req.body.username,
@@ -35,6 +36,7 @@ exports.getAlloperateur = async (req, res) => {
       res.status(404).send(err);
     }
   });
+
 };
 
 exports.getoperateurByUsername = async (req, res) => {

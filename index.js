@@ -9,12 +9,11 @@ const auth = require('./routes/auth')
 const authMidd = require('./middleware/authMidd')
 const isManager = require('./middleware/isManager')
 const {verifytoken} = require('./controllers/verifytokenController')
-const router = express.Router();
-
-
+const {connectmqtt} = require ('./broker')
 require('dotenv').config();
 
 
+connectmqtt()
 connectdb();
 app.use(express.json({extended:false}))
 app.use(cors())

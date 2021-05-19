@@ -4,9 +4,7 @@ const mongoose = require('mongoose')
 
 
 exports.addshift = async (req, res) => {
-
   try {
-
     let sh = new Shift({
       operateur: req.user.id,
       machine: req.body.machine,
@@ -26,8 +24,9 @@ exports.addshift = async (req, res) => {
               if (!data) {
                 res.status(404).send("Erreur");
               } else {
-                const s = await sh.save();
-                res.status(200).send(s)
+                let s = await sh.save();
+                $: sh = await Shift.findById(s._id).populate('machine').populate('operateur')
+                res.status(200).send(sh)
               }
             })
 
@@ -60,7 +59,7 @@ exports.endshift = async (req, res) => {
               res.status(400).send("machine not updated")
             }
             else {
-              res.send({
+              res.status(200).send({
                 msg: "Well ended"
               })
             }
@@ -74,12 +73,12 @@ exports.endshift = async (req, res) => {
 };
 
 exports.getallshifts = async (req, res) => {
-      Shift.find().populate('operateur').populate('machine').then((data) =>{ res.send(data)})
+    await Shift.find().populate('operateur','_id username name role score').populate('machine','_id factory room machine busy').then((data) =>{ res.send(data)})
 };  
 
 exports.getshift = async (req, res) => {
   try {
-    const sh = await Shift.findById(req.params.id).populate('operateur').populate('machine')
+    const sh = await Shift.findById(req.params.id).populate('operateur','_id username name role score').populate('machine','_id factory room machine busy')
     if (sh) {
       res.json(sh);
     } else (
@@ -90,3 +89,22 @@ exports.getshift = async (req, res) => {
   }
 
 };
+
+
+
+
+exports.getshiftsByOperateur = async (req, res) => {
+  try {
+    const sh = await Shift.find({operateur : req.params.id}, (err, docs) => {
+      if (!err) { res.json(docs) }
+      else {
+        res.status(404).send(err);
+      }
+    }).populate('operateur','_id username name role score').populate('machine','_id factory room machine busy').sort('createdAt');
+  
+  } catch (err) {
+    res.send(err)
+  }
+
+};
+

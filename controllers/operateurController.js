@@ -1,6 +1,5 @@
 const Operateur = require('../models/Operateur');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 
 
 exports.addoperateur = async (req, res) => {

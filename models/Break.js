@@ -2,18 +2,14 @@ const mongoose = require('mongoose');
 
 
 const Break = new mongoose.Schema({
-    dateready: {
+    breakend: {
         type: Date,
-        required: true
-    },
-    Shift:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref : 'Shift',
-        required: true
+        required: false,
+        default:null
     },
     justification: {
         type: String,
-        required: true,
+        required: false,
         default:'non justifiee'
     },
     

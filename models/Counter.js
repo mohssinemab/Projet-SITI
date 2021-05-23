@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
-const Statistics = new mongoose.Schema({
+const Counter = new mongoose.Schema({
     shift: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'operation',
+        ref: 'Shift',
         required: true
     },
     counter:{
@@ -13,4 +13,4 @@ const Statistics = new mongoose.Schema({
 }, { timestamps: true })
 
 
-module.exports = mongoose.model('Statistics', Statistics);
+module.exports = mongoose.model('Counter', Counter);

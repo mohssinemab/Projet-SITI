@@ -20,6 +20,12 @@ const Shift = new mongoose.Schema({
         type : String,
         required: true
     },
+    breaks:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Break',
+        required: false,
+        
+    }],
     breaktime:{
         type : Number,
         default : 0,

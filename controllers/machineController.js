@@ -83,31 +83,3 @@ exports.getfreemachines = async (req, res) => {
   });
 };
 
-// exports.getbusymachines = (req, res) => {
-//   let data=[];
-//   Machine.find({ busy: true }, (err, docs) => {
-//     if (!err) {
-//      docs.forEach(async doc => {
-//         let sh = await Shift.findOne({machine:doc._id,datefin:null})
-//         let d ={machine : doc, operateur:sh.operateur};
-//         console.log(d);
-//         console.log("------");
-//         data=[...data,d];
-//       })
-
-//       console.log("++++++++++++++++");
-//       console.log(data);
-//       res.json(docs)
-//     }
-//     else {
-//       res.status(400).send(err);
-//     }
-//   });
-// };
-
-// {machines.map((m)=>{
-//   const index =  authContext.shifts.findIndex((obj => obj.machine == m._id));
-//   m = {...m,product: authContext.shifts[index].produit ,shift: authContext.shifts[index]._id}; 
-// return <ShiftCard  item={m} key={m._id} />
-// } )}
-

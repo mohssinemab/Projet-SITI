@@ -3,7 +3,7 @@ const {getbreakid,addjustification,endbreak}= require('../controllers/breakContr
 const router = express.Router();
 
 
-router.get('/getbreakid',getbreakid);
+router.post('/getbreakid',getbreakid);
 
 router.get('/endbreak/:id',endbreak);
 

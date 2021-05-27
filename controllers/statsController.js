@@ -71,6 +71,72 @@ exports.getcounterbyoperateur = async (req, res) => {
 }
 
 
+exports.getcounterbymachine = async (req, res) => {
+    try {
+        const id = req.body.id;
+        let datedebut = req.body.datedebut;
+        let datefin = req.body.datefin;
+
+        if (datedebut == undefined && datefin == undefined) {
+
+            let c = await Counter.find().populate('shift');
+            let data = [];
+            c.forEach(doc => {
+                if (doc.shift.machine == id) {
+                    data.push(doc);
+                }
+            })
+
+            res.send(data);
+        } else if (datedebut != undefined && datefin == undefined) {
+            datedebut = new Date(datedebut);
+            datedebut = new Date(datedebut.toISOString())
+
+            console.log("-----/ datedebut : ", datedebut);
+            console.log("-----/ dateFIN : ", datefin);
+
+            let c = await Counter.find({
+                createdAt: {
+                    $gte: datedebut
+                }
+            }).populate('shift');
+            let data = [];
+            c.forEach(doc => {
+                if (doc.shift.machine == id) {
+                    data.push(doc);
+                }
+            })
+
+            res.send(data);
+
+
+        } else {
+            datedebut = new Date(datedebut);
+            datefin = new Date(datefin);
+            console.log("----- datedebut : ", datedebut);
+            console.log("----- datefin : ", datefin);
+
+            let c = await Counter.find({
+                createdAt: {
+                    $gte: datedebut,
+                    $lte: datefin
+                }
+            }).populate('shift');
+            let data = [];
+            c.forEach(doc => {
+                if (doc.shift.machine == id) {
+                    data.push(doc);
+                }
+            })
+            console.log("data : ",data);
+            res.send(data);
+        }
+    } catch (err) {
+        res.status(400).send(err);
+    }
+}
+
+
 exports.getallbreaksbyoperateur = async (req, res) => {
     try {
         const id = req.params.id;

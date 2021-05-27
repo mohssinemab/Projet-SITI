@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const {getcounterbyoperateur,getallbreaksbyoperateur,getallbreaksbymachine,getshiftsbyoperateurbydate,getoperateurstats,getmachineswithnumberofbreaks} = require('../controllers/statsController')
+const {getcounterbymachine,getcounterbyoperateur,getallbreaksbyoperateur,getallbreaksbymachine,getshiftsbyoperateurbydate,getoperateurstats,getmachineswithnumberofbreaks} = require('../controllers/statsController')
 
 
 
 router.post('/getcounterbyoperateur',getcounterbyoperateur);
+
+router.post('/getcounterbymachine',getcounterbymachine);
 
 router.get('/getallbreaksbyoperateur/:id',getallbreaksbyoperateur);
 

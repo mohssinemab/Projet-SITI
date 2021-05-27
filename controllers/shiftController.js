@@ -90,6 +90,21 @@ exports.getshift = async (req, res) => {
 
 };
 
+exports.getactiveshiftofmachine = async (req, res) => {
+  try {
+    Shift.findOne({machine : req.params.id, datefin :null}, (err, doc) => {
+      if (!err) { 
+        res.json(doc) }
+      else {
+        res.status(404).send(err);
+      }
+    }).populate('operateur','_id username name role score').populate('machine','_id factory room machine busy');
+  
+  } catch (err) {
+    res.send(err)
+  }
+};
+
 
 
 

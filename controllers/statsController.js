@@ -97,7 +97,7 @@ exports.getcounterbymachine = async (req, res) => {
 
             let c = await Counter.find({
                 createdAt: {
-                    $gte: datedebut
+                    $gte: ISODate(datedebut)
                 }
             }).populate('shift');
             let data = [];
@@ -118,8 +118,8 @@ exports.getcounterbymachine = async (req, res) => {
 
             let c = await Counter.find({
                 createdAt: {
-                    $gte: datedebut,
-                    $lte: datefin
+                    $gte: ISODate(datedebut),
+                    $lte: ISODate(datefin)
                 }
             }).populate('shift');
             let data = [];
@@ -252,34 +252,7 @@ exports.getmachineswithnumberofbreaks = async (req, res) => {
 
 
 
-// try {
 
-//     let data=[];
-//     const machines = await Shift.find().distinct('machine')
-//     console.log("machines  : ", machines );
-//     machines.forEach(async mach => {
-//         let n=0;
-//         const sh = await Shift.find({ machine: mach }).populate('breaks');
-//         sh.forEach(s => {
-//             console.log("shift  : ",s);
-
-//             n+=s.breaks.length;
-//             console.log(n);
-//         })
-//         console.log(n);
-//         let doc = {
-//             "machine":mach,
-//             "breaks" : n
-//         }
-//         console.log(doc);
-//          data.push(doc)
-//     })
-//     console.log("daaaaata :",data);
-//     res.send(data)
-
-// } catch (err) {
-//     res.status(400).send(err)
-// }
 
 exports.getoperateurstats = async (req, res) => {
     try {

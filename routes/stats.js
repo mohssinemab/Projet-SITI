@@ -16,7 +16,7 @@ router.post('/getshiftsbyoperateurbydate',getshiftsbyoperateurbydate);
 
 router.get('/getmachineswithnumberofbreaks',getmachineswithnumberofbreaks);
 
-router.get('/getoperateurstats/:id',getoperateurstats);
+router.get('/getoperateurstats',getoperateurstats);
 
 
 module.exports = router;

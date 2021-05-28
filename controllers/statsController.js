@@ -128,7 +128,7 @@ exports.getcounterbymachine = async (req, res) => {
                     data.push(doc);
                 }
             })
-            console.log("data : ",data);
+            console.log("data : ", data);
             res.send(data);
         }
     } catch (err) {
@@ -218,7 +218,8 @@ exports.getmachineswithnumberofbreaks = async (req, res) => {
         let data = [];
         const machines = await Shift.find().distinct('machine')
         console.log("machines  : ", machines);
-        machines.forEach(async mach => {
+        const x= machines.length - 1;
+        machines.forEach(async (mach,l,machines) => {
             let n = 0;
             const docs = await Shift.find({ machine: mach }).populate('breaks');
 
@@ -236,12 +237,17 @@ exports.getmachineswithnumberofbreaks = async (req, res) => {
             console.log(doc);
             data.push(doc)
             console.log("ssssssssssdaaaaata :", data);
+            console.log("l : ",l,"  length : ",x, "  condition : ",l == x); 
 
+            if (l == x) {
+                console.log("--------------daaaaata :", data);
+    
+                res.send(data)
+            }
 
         })
 
-        console.log("daaaaata :", data);
-            res.send(data)
+        
         
 
 
@@ -256,44 +262,49 @@ exports.getmachineswithnumberofbreaks = async (req, res) => {
 
 exports.getoperateurstats = async (req, res) => {
     try {
-        const id = req.params.id;
-        let stats = {};
-        const sh = await Shift.find({ operateur: id }).populate('breaks').populate('operateur', '_id username name role score')
+        let stats = [];
 
-        stats.operateur = sh[0].operateur;
-        stats.nbrshifts = sh.length;
-        stats.nbrproduit = 0;
-        stats.nbrbreaks = 0
-        stats.nbrbreaksjustifiee = 0;
-        stats.nbrbreaksnonjustifiee = 0
+        const ids = await Shift.find().distinct('operateur');
+        console.log(ids);
+        ids.forEach(async (id, l, ids) => {
+            let sh = await Shift.find({ operateur: id }).populate('breaks').populate('operateur', '_id username name role score')
+            let stat = {};
+            stat.operateur = sh[0].operateur;
+            stat.nbrshifts = sh.length;
+            stat.nbrproduit = 0;
+            stat.nbrbreaks = 0
+            stat.nbrbreaksjustifiee = 0;
+            stat.nbrbreaksnonjustifiee = 0
 
-        sh.forEach(doc => {
-            if (doc.breaks.length > 0) {
-                stats.nbrbreaks += doc.breaks.length;
-                doc.breaks.forEach(d => {
-                    if (d.justification == "non justifiee") {
-                        stats.nbrbreaksnonjustifiee += 1;
-                    } else {
-                        stats.nbrbreaksjustifiee += 1;
-                    }
+            sh.forEach(doc => {
+                if (doc.breaks.length > 0) {
+                    stat.nbrbreaks += doc.breaks.length;
+                    doc.breaks.forEach(d => {
+                        if (d.justification == "non justifiee") {
+                            stat.nbrbreaksnonjustifiee += 1;
+                        } else {
+                            stat.nbrbreaksjustifiee += 1;
+                        }
 
-                })
+                    })
+                }
+            })
+
+            let c = await Counter.find().populate('shift');
+            c.forEach(doc => {
+                if (JSON.stringify(doc.shift.operateur._id) == JSON.stringify(id)) {
+                    stat.nbrproduit += doc.counter;
+                }
+            })
+            
+            stats.push(stat)
+
+            if (l == ids.length - 1) {
+
+                res.send(stats)
             }
         })
 
-        let c = await Counter.find().populate('shift');
-        let data = [];
-        c.forEach(doc => {
-            if (doc.shift.operateur == id) {
-                data.push(doc);
-            }
-        })
-
-        data.forEach(d => {
-            stats.nbrproduit += d.counter;
-        })
-
-        res.send(stats)
     } catch (err) {
         console.log(err);
         res.status(400).send(err)

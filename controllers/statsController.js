@@ -90,14 +90,14 @@ exports.getcounterbymachine = async (req, res) => {
             res.send(data);
         } else if (datedebut != undefined && datefin == undefined) {
             datedebut = new Date(datedebut);
-            datedebut = new Date(datedebut.toISOString())
+            datedebut = new Date(datedebut)
 
             console.log("-----/ datedebut : ", datedebut);
             console.log("-----/ dateFIN : ", datefin);
 
             let c = await Counter.find({
                 createdAt: {
-                    $gte: ISODate(datedebut)
+                    $gte: datedebut
                 }
             }).populate('shift');
             let data = [];
@@ -118,8 +118,8 @@ exports.getcounterbymachine = async (req, res) => {
 
             let c = await Counter.find({
                 createdAt: {
-                    $gte: ISODate(datedebut),
-                    $lte: ISODate(datefin)
+                    $gte: datedebut,
+                    $lte: datefin
                 }
             }).populate('shift');
             let data = [];

@@ -5,6 +5,7 @@ const Machine = require('../models/Machine');
 const Counter = require('../models/Counter');
 const mongoose = require('mongoose')
 
+
 exports.getcounterbyoperateur = async (req, res) => {
     try {
         const id = req.body.id;
@@ -16,8 +17,11 @@ exports.getcounterbyoperateur = async (req, res) => {
             let c = await Counter.find().populate('shift');
             let data = [];
             c.forEach(doc => {
-                if (doc.shift.operateur == id) {
-                    data.push(doc);
+                if (doc.shift != null) {
+
+                    if (doc.shift.operateur == id) {
+                        data.push(doc);
+                    }
                 }
             })
 
@@ -36,8 +40,11 @@ exports.getcounterbyoperateur = async (req, res) => {
             }).populate('shift');
             let data = [];
             c.forEach(doc => {
-                if (doc.shift.operateur == id) {
-                    data.push(doc);
+                if (doc.shift != null) {
+
+                    if (doc.shift.operateur == id) {
+                        data.push(doc);
+                    }
                 }
             })
 
@@ -59,14 +66,18 @@ exports.getcounterbyoperateur = async (req, res) => {
             }).populate('shift');
             let data = [];
             c.forEach(doc => {
-                if (doc.shift.operateur == id) {
-                    data.push(doc);
+                if (doc.shift != null) {
+
+                    if (doc.shift.operateur == id) {
+                        data.push(doc);
+                    }
                 }
             })
 
             res.send(data);
         }
     } catch (err) {
+        console.log(err);
         res.status(400).send(err);
     }
 }
@@ -83,8 +94,11 @@ exports.getcounterbymachine = async (req, res) => {
             let c = await Counter.find().populate('shift');
             let data = [];
             c.forEach(doc => {
-                if (doc.shift.machine == id) {
-                    data.push(doc);
+                if (doc.shift != null) {
+
+                    if (doc.shift.machine == id) {
+                        data.push(doc);
+                    }
                 }
             })
 
@@ -103,8 +117,11 @@ exports.getcounterbymachine = async (req, res) => {
             }).populate('shift');
             let data = [];
             c.forEach(doc => {
-                if (doc.shift.machine == id) {
-                    data.push(doc);
+                if (doc.shift != null) {
+
+                    if (doc.shift.machine == id) {
+                        data.push(doc);
+                    }
                 }
             })
 
@@ -125,8 +142,11 @@ exports.getcounterbymachine = async (req, res) => {
             }).populate('shift');
             let data = [];
             c.forEach(doc => {
-                if (doc.shift.machine == id) {
-                    data.push(doc);
+                if (doc.shift != null) {
+
+                    if (doc.shift.machine == id) {
+                        data.push(doc);
+                    }
                 }
             })
             console.log("data : ", data);
@@ -221,8 +241,8 @@ exports.getmachineswithnumberofbreaks = async (req, res) => {
         console.log("machines  : ", machines);
         const x = machines.length - 1;
 
-        for(i=0;i<machines.length;i++){
-            let mach=machines[i];
+        for (i = 0; i < machines.length; i++) {
+            let mach = machines[i];
             let n = 0;
             const docs = await Shift.find({ machine: mach }).populate('breaks');
 
@@ -241,7 +261,7 @@ exports.getmachineswithnumberofbreaks = async (req, res) => {
             data.push(doc)
             console.log("ssssssssssdaaaaata :", data);
 
-            if (i == machines.length-1) {
+            if (i == machines.length - 1) {
                 console.log("--------------daaaaata :", data);
 
                 res.send(data)
@@ -266,8 +286,8 @@ exports.getoperateurstats = async (req, res) => {
 
         const ids = await Shift.find().distinct('operateur');
         console.log(ids);
-        for(i=0;i<ids.length;i++){
-            let id=ids[i];
+        for (i = 0; i < ids.length; i++) {
+            let id = ids[i];
             let sh = await Shift.find({ operateur: id }).populate('breaks').populate('operateur', '_id username name role score')
             let stat = {};
             stat.operateur = sh[0].operateur;

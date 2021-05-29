@@ -41,10 +41,10 @@ exports.connectmqtt = () => {
           // check if the machine already in a break
           const s = await Shift.findOne({ machine: mach._id, datefin: null }).populate('breaks');
           const l = s.breaks.length;
-          if(l>0){
-            const lastbreak = s.breaks[l- 1];
-            
-            if (lastbreak.breakend!=null) {
+          if (l > 0) {
+            const lastbreak = s.breaks[l - 1];
+
+            if (lastbreak.breakend != null) {
               console.log("====No break alive , we'll create one : ")
               let b = new Break();
               const update = {
@@ -62,7 +62,7 @@ exports.connectmqtt = () => {
                   }
                 })
                 .catch(err => console.error(`Failed to find and update shift : ${err}`))
-  
+
               // send -1 on the broker
               const stop = '-1';
               const options = {
@@ -72,42 +72,42 @@ exports.connectmqtt = () => {
               sendmsg(topic, stop, options);
             } else {
               console.log(" ---------------Machine : ", topic, "  already in a break")
-  
+
             }
 
 
-          }else{
+          } else {
             console.log("====Shift was never in a break , we'll create one : ")
 
             let b = new Break();
-              const update = {
-                $push: {
-                  breaks: b
+            const update = {
+              $push: {
+                breaks: b
+              }
+            };
+            await Shift.findOneAndUpdate({ machine: mach._id, datefin: null }, update, { returnNewDocument: true })
+              .then(async doc => {
+                if (doc) {
+                  const res = await b.save();
+                  console.log('-- Break well added  ');
+                } else {
+                  console.log('-- Shift not found ');
                 }
-              };
-              await Shift.findOneAndUpdate({ machine: mach._id, datefin: null }, update, { returnNewDocument: true })
-                .then(async doc => {
-                  if (doc) {
-                    const res = await b.save();
-                    console.log('-- Break well added  ');
-                  } else {
-                    console.log('-- Shift not found ');
-                  }
-                })
-                .catch(err => console.error(`Failed to find and update shift : ${err}`))
-  
-              // send -1 on the broker
-              const stop = '-1';
-              const options = {
-                retain: false,
-                qos: 0
-              };
-              sendmsg(topic, stop, options);
+              })
+              .catch(err => console.error(`Failed to find and update shift : ${err}`))
+
+            // send -1 on the broker
+            const stop = '-1';
+            const options = {
+              retain: false,
+              qos: 0
+            };
+            sendmsg(topic, stop, options);
 
           }
-          
 
-          
+
+
 
         } else {
           console.log(" ---------------Machine not Found :  ", topic)
@@ -126,19 +126,19 @@ exports.connectmqtt = () => {
 
           await Shift.findOne({ machine: mach._id, datefin: null }
             , async (err, doc) => {
-            if (!err && doc) {
-              let c = new Counter({
-                shift: doc._id,
-                counter: parseInt(message)
-              });
-              let result = await c.save();
-              console.log(" Counter save ------ : ", result);
-            } else if (!doc) {
-              console.log(" Shift not found ");
-            } else {
-              console.log(" Erreur : ", err);
-            }
-          })
+              if (!err && doc) {
+                let c = new Counter({
+                  shift: doc._id,
+                  counter: parseInt(message)
+                });
+                let result = await c.save();
+                console.log(" Counter save ------ : ", result);
+              } else if (!doc) {
+                console.log(" Shift not found ");
+              } else {
+                console.log(" Erreur : ", err);
+              }
+            })
         } else {
           console.log(" ---------------Machine not Found :  ", topic)
 

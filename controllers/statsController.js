@@ -1,6 +1,7 @@
 const Shift = require('../models/Shift');
 const Break = require('../models/Break')
 const Operateur = require('../models/Operateur');
+const Machine = require('../models/Machine');
 const Counter = require('../models/Counter');
 const mongoose = require('mongoose')
 
@@ -216,10 +217,12 @@ exports.getmachineswithnumberofbreaks = async (req, res) => {
     try {
 
         let data = [];
-        const machines = await Shift.find().distinct('machine')
+        const machines = await Shift.find().distinct('machine');
         console.log("machines  : ", machines);
-        const x= machines.length - 1;
-        machines.forEach(async (mach,l,machines) => {
+        const x = machines.length - 1;
+
+        for(i=0;i<machines.length;i++){
+            let mach=machines[i];
             let n = 0;
             const docs = await Shift.find({ machine: mach }).populate('breaks');
 
@@ -231,27 +234,24 @@ exports.getmachineswithnumberofbreaks = async (req, res) => {
             })
             console.log(n);
             let doc = {
-                machine: mach,
+                machine: await Machine.findById(mach),
                 breaks: n
             }
             console.log(doc);
             data.push(doc)
             console.log("ssssssssssdaaaaata :", data);
-            console.log("l : ",l,"  length : ",x, "  condition : ",l == x); 
 
-            if (l == x) {
+            if (i == machines.length-1) {
                 console.log("--------------daaaaata :", data);
-    
+
                 res.send(data)
             }
 
-        })
-
-        
-        
+        }
 
 
     } catch (err) {
+        console.log(err);
         res.status(400).send(err)
     }
 }
@@ -266,7 +266,8 @@ exports.getoperateurstats = async (req, res) => {
 
         const ids = await Shift.find().distinct('operateur');
         console.log(ids);
-        ids.forEach(async (id, l, ids) => {
+        for(i=0;i<ids.length;i++){
+            let id=ids[i];
             let sh = await Shift.find({ operateur: id }).populate('breaks').populate('operateur', '_id username name role score')
             let stat = {};
             stat.operateur = sh[0].operateur;
@@ -275,7 +276,7 @@ exports.getoperateurstats = async (req, res) => {
             stat.nbrbreaks = 0
             stat.nbrbreaksjustifiee = 0;
             stat.nbrbreaksnonjustifiee = 0
-
+            console.log("shifts of ", id, " : ", sh);
             sh.forEach(doc => {
                 if (doc.breaks.length > 0) {
                     stat.nbrbreaks += doc.breaks.length;
@@ -290,20 +291,25 @@ exports.getoperateurstats = async (req, res) => {
                 }
             })
 
-            let c = await Counter.find().populate('shift');
+            let c = await Counter.find({ shift: { $exists: true, $ne: null } }).populate('shift');
+            console.log("all counters : ", c);
+
             c.forEach(doc => {
-                if (JSON.stringify(doc.shift.operateur._id) == JSON.stringify(id)) {
-                    stat.nbrproduit += doc.counter;
+                console.log("for each counter : ", doc);
+                if (doc.shift != null) {
+                    if (JSON.stringify(doc.shift.operateur._id) == JSON.stringify(id)) {
+                        stat.nbrproduit += doc.counter;
+                    }
                 }
             })
-            
+
             stats.push(stat)
 
-            if (l == ids.length - 1) {
+            if (i == ids.length - 1) {
 
                 res.send(stats)
             }
-        })
+        }
 
     } catch (err) {
         console.log(err);

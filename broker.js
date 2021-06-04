@@ -141,7 +141,7 @@ exports.connectmqtt = () => {
                 console.log("ghost op : ", gh_op);
                 console.log(mach)
 
-                const gh_sh = await Shift.findOne({ operateur: gh_op._id, datefin: null });
+                const gh_sh = await Shift.findOne({ operateur: gh_op._id,machine : mach._id, datefin: null });
                 console.log(" --- ghost shift : ", gh_sh);
 
                 let c = new Counter({

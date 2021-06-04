@@ -83,7 +83,7 @@ exports.endshift = async (req, res) => {
 
 exports.getallshifts = async (req, res) => {
   try {
-    await Shift.find().populate('operateur', '_id username name role score').populate('machine', '_id factory room machine busy').then((data) => { res.send(data) })
+    await Shift.find({ produit: { $ne: "GHOST" }}).populate('operateur', '_id username name role score').populate('machine', '_id factory room machine busy').then((data) => { res.send(data) })
   } catch (err) {
     res.status(400).send(err);
   }

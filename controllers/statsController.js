@@ -285,7 +285,7 @@ exports.getoperateurstats = async (req, res) => {
     try {
         let stats = [];
 
-        const ids = await Shift.find().distinct('operateur');
+        const ids = await Shift.find({ produit: { $ne: "GHOST" }}).distinct('operateur');
         console.log(ids);
         for (i = 0; i < ids.length; i++) {
             let id = ids[i];

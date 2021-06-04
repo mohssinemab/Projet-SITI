@@ -1,41 +1,47 @@
 const Shift = require('../models/Shift');
 const Machine = require('../models/Machine');
+const Operateur = require('../models/Operateur');
+
 const mongoose = require('mongoose')
 
 
 exports.addshift = async (req, res) => {
   try {
-    if(req.user.id==null){
-      res.status(400).send(" can't use a null id, maybe an expired token")
-    }
-    let sh = new Shift({
-      operateur: req.user.id,
-      machine: req.body.machine,
-      produit: req.body.produit
-    });
+    const op = await Operateur.findById(req.user.id);
+    if (op) {
 
-    Machine.findById(sh.machine, async (err, doc) => {
-      if (!doc) {
-        res.status(404).send("Machine not found : ", err);
-      } else {
-        if (doc.busy == true) {
-          res.status(400).send("Machine already in use")
+      let sh = new Shift({
+        operateur: req.user.id,
+        machine: req.body.machine,
+        produit: req.body.produit
+      });
+
+      Machine.findById(sh.machine, async (err, doc) => {
+        if (!doc) {
+          res.status(404).send("Machine not found : ", err);
         } else {
-          mongoose.set('useFindAndModify', false);
-          await Machine.findByIdAndUpdate(sh.machine, { busy: true }, { new: true })
-            .then(async data => {
-              if (!data) {
-                res.status(404).send("Erreur");
-              } else {
-                let s = await sh.save();
-                $: sh = await Shift.findById(s._id).populate('machine').populate('operateur')
-                res.status(200).send(sh)
-              }
-            })
+          if (doc.busy == true) {
+            res.status(400).send("Machine already in use")
+          } else {
+            mongoose.set('useFindAndModify', false);
+            await Machine.findByIdAndUpdate(sh.machine, { busy: true }, { new: true })
+              .then(async data => {
+                if (!data) {
+                  res.status(404).send("Erreur");
+                } else {
+                  let s = await sh.save();
+                  $: sh = await Shift.findById(s._id).populate('machine').populate('operateur')
+                  res.status(200).send(sh)
+                }
+              })
 
+          }
         }
-      }
-    })
+      })
+    } else {
+      res.status(400).send(" can't use a null id, maybe an expired token")
+
+    }
 
   } catch (err) {
     console.log(err.message);
@@ -76,16 +82,16 @@ exports.endshift = async (req, res) => {
 };
 
 exports.getallshifts = async (req, res) => {
-  try{
-    await Shift.find().populate('operateur','_id username name role score').populate('machine','_id factory room machine busy').then((data) =>{ res.send(data)})
-  }catch(err){
+  try {
+    await Shift.find().populate('operateur', '_id username name role score').populate('machine', '_id factory room machine busy').then((data) => { res.send(data) })
+  } catch (err) {
     res.status(400).send(err);
   }
-  };  
+};
 
 exports.getshift = async (req, res) => {
   try {
-    const sh = await Shift.findById(req.params.id).populate('operateur','_id username name role score').populate('machine','_id factory room machine busy')
+    const sh = await Shift.findById(req.params.id).populate('operateur', '_id username name role score').populate('machine', '_id factory room machine busy')
     if (sh) {
       res.json(sh);
     } else (
@@ -99,14 +105,15 @@ exports.getshift = async (req, res) => {
 
 exports.getactiveshiftofmachine = async (req, res) => {
   try {
-    Shift.findOne({machine : req.params.id, datefin :null, produit :{$ne : "GHOST"}}, (err, doc) => {
-      if (!err) { 
-        res.json(doc) }
+    Shift.findOne({ machine: req.params.id, datefin: null, produit: { $ne: "GHOST" } }, (err, doc) => {
+      if (!err) {
+        res.json(doc)
+      }
       else {
         res.status(404).send(err);
       }
-    }).populate('operateur','_id username name role score').populate('machine','_id factory room machine busy');
-  
+    }).populate('operateur', '_id username name role score').populate('machine', '_id factory room machine busy');
+
   } catch (err) {
     res.send(err)
   }
@@ -117,13 +124,13 @@ exports.getactiveshiftofmachine = async (req, res) => {
 
 exports.getshiftsByOperateur = async (req, res) => {
   try {
-    const sh = await Shift.find({operateur : req.params.id}, (err, docs) => {
+    const sh = await Shift.find({ operateur: req.params.id }, (err, docs) => {
       if (!err) { res.json(docs) }
       else {
         res.status(404).send(err);
       }
-    }).populate('operateur','_id username name role score').populate('machine','_id factory room machine busy').sort('createdAt');
-  
+    }).populate('operateur', '_id username name role score').populate('machine', '_id factory room machine busy').sort('createdAt');
+
   } catch (err) {
     res.send(err)
   }

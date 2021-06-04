@@ -1,5 +1,6 @@
 const mqtt = require('mqtt');
 const Counter = require('./models/Counter');
+const Operateur = require('./models/Operateur');
 const Shift = require('./models/Shift');
 const Machine = require('./models/Machine');
 const Break = require('./models/Break');
@@ -28,6 +29,7 @@ exports.connectmqtt = () => {
 
     let topicRecu = topic.slice(12, topic.length);
 
+    let hbreaks = [];
     if (topicRecu == "counter") {
       if (parseInt(message) < 7 && parseInt(message) != -1 && parseInt(message) != 0) {
         console.log(" Bad counter : ", topic, " - ", parseInt(message))
@@ -35,17 +37,76 @@ exports.connectmqtt = () => {
         // mark the break
         const mach = await Machine.findOne({ factory: f, room: r, machine: m });
         if (mach) {
-
           mongoose.set('useFindAndModify', false);
+          console.log(" ----- table hbreaks :  ",hbreaks);
+          let condition = false;
+          let breakalert = false;
+          hbreaks.forEach(hb => {
+            if (hb.mach == mach) {
+              
+              hb.index++;
+              condition = true;
+              console.log(" hbreak found , mach : ",mach," index after incr : ",hb.index );
+              if (hb.index >= 6) {
+                breakalert = true;
+              }
+            }
+          })
+          console.log(" ----- condition  :  ",condition);
 
-          // check if the machine already in a break
-          const s = await Shift.findOne({ machine: mach._id, datefin: null }).populate('breaks');
-          const l = s.breaks.length;
-          if (l > 0) {
-            const lastbreak = s.breaks[l - 1];
+          if (condition == false) {
+            let doc = {
+              machine: mach,
+              index: 1
+            }
+            console.log(" ----- doc to push :  ",doc);
 
-            if (lastbreak.breakend != null) {
-              console.log("====No break alive , we'll create one : ")
+            await hbreaks.push(doc)
+            console.log(" ----- hbreaks:  ",hbreaks);
+
+          }
+          if (breakalert == true) {
+            // check if the machine already in a break
+            const s = await Shift.findOne({ machine: mach._id, datefin: null }).populate('breaks');
+            const l = s.breaks.length;
+            if (l > 0) {
+              const lastbreak = s.breaks[l - 1];
+
+              if (lastbreak.breakend != null) {
+                console.log("====No break alive , we'll create one : ")
+                let b = new Break();
+                const update = {
+                  $push: {
+                    breaks: b
+                  }
+                };
+                await Shift.findOneAndUpdate({ machine: mach._id, datefin: null }, update, { returnNewDocument: true })
+                  .then(async doc => {
+                    if (doc) {
+                      const res = await b.save();
+                      console.log('-- Break well added  ');
+                    } else {
+                      console.log('-- Shift not found ');
+                    }
+                  })
+                  .catch(err => console.error(`Failed to find and update shift : ${err}`))
+
+                // send -1 on the broker
+                const stop = '-1';
+                const options = {
+                  retain: false,
+                  qos: 0
+                };
+                sendmsg(topic, stop, options);
+              } else {
+                console.log(" ---------------Machine : ", topic, "  already in a break")
+
+              }
+
+
+            } else {
+              console.log("====Shift was never in a break , we'll create one : ")
+
               let b = new Break();
               const update = {
                 $push: {
@@ -70,51 +131,18 @@ exports.connectmqtt = () => {
                 qos: 0
               };
               sendmsg(topic, stop, options);
-            } else {
-              console.log(" ---------------Machine : ", topic, "  already in a break")
 
             }
 
 
-          } else {
-            console.log("====Shift was never in a break , we'll create one : ")
-
-            let b = new Break();
-            const update = {
-              $push: {
-                breaks: b
-              }
-            };
-            await Shift.findOneAndUpdate({ machine: mach._id, datefin: null }, update, { returnNewDocument: true })
-              .then(async doc => {
-                if (doc) {
-                  const res = await b.save();
-                  console.log('-- Break well added  ');
-                } else {
-                  console.log('-- Shift not found ');
-                }
-              })
-              .catch(err => console.error(`Failed to find and update shift : ${err}`))
-
-            // send -1 on the broker
-            const stop = '-1';
-            const options = {
-              retain: false,
-              qos: 0
-            };
-            sendmsg(topic, stop, options);
-
           }
-
-
-
 
         } else {
           console.log(" ---------------Machine not Found :  ", topic)
 
         }
 
-      } else if (parseInt(message) > 7) {
+      } else if (parseInt(message) >= 7) {
         console.log(" Good counter : ", parseInt(message))
 
         // find the exact machine
@@ -124,7 +152,7 @@ exports.connectmqtt = () => {
         if (mach) {
 
 
-          await Shift.findOne({ machine: mach._id, datefin: null }
+          await Shift.findOne({ machine: mach._id, datefin: null, produit: { $ne: "GHOST" } }
             , async (err, doc) => {
               if (!err && doc) {
                 let c = new Counter({
@@ -134,7 +162,21 @@ exports.connectmqtt = () => {
                 let result = await c.save();
                 console.log(" Counter save ------ : ", result);
               } else if (!doc) {
-                console.log(" Shift not found ");
+
+                const gh_op = await Operateur.findOne({ role: "ghost" });
+                console.log("ghost op : ", gh_op);
+                console.log(mach)
+
+                const gh_sh = await Shift.findOne({ operateur: gh_op._id, datefin: null });
+                console.log(" --- ghost shift : ", gh_sh);
+
+                let c = new Counter({
+                  shift: gh_sh._id,
+                  counter: parseInt(message)
+                });
+                let result = await c.save();
+                console.log(" --- Counter GHOST save ------ : ", result);
+
               } else {
                 console.log(" Erreur : ", err);
               }

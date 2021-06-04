@@ -97,6 +97,7 @@ exports.getcounterbymachine = async (req, res) => {
                 if (doc.shift != null) {
 
                     if (doc.shift.machine == id) {
+
                         data.push(doc);
                     }
                 }
@@ -290,7 +291,9 @@ exports.getoperateurstats = async (req, res) => {
             let id = ids[i];
             let sh = await Shift.find({ operateur: id }).populate('breaks').populate('operateur', '_id username name role score')
             let stat = {};
+ 
             stat.operateur = sh[0].operateur;
+
             stat.nbrshifts = sh.length;
             stat.nbrproduit = 0;
             stat.nbrbreaks = 0
@@ -323,8 +326,10 @@ exports.getoperateurstats = async (req, res) => {
                 }
             })
 
-            stats.push(stat)
+            if(stat.operateur!=null){
 
+            stats.push(stat)
+        }
             if (i == ids.length - 1) {
 
                 res.send(stats)

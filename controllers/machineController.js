@@ -1,4 +1,5 @@
 const Machine = require('../models/Machine');
+const Operateur = require('../models/Operateur');
 const Shift = require('../models/Shift');
 
 
@@ -16,7 +17,16 @@ exports.addmachine = async (req, res) => {
 
       try {
         let result = await mach.save();
+        const ghost = await Operateur.findOne({role : "ghost"}) ;
+        let ghostshift = new Shift ({
+          operateur : ghost._id,
+          machine :result._id,
+          produit : "GHOST"
+        });
+        const rest = await ghostshift.save();
         console.log(result);
+        console.log(rest);
+
         res.status(200).send(result)
       } catch (err) {
         console.log(err.message);

@@ -73,8 +73,12 @@ exports.endshift = async (req, res) => {
 };
 
 exports.getallshifts = async (req, res) => {
+  try{
     await Shift.find().populate('operateur','_id username name role score').populate('machine','_id factory room machine busy').then((data) =>{ res.send(data)})
-};  
+  }catch(err){
+    res.status(400).send(err);
+  }
+  };  
 
 exports.getshift = async (req, res) => {
   try {
@@ -92,7 +96,7 @@ exports.getshift = async (req, res) => {
 
 exports.getactiveshiftofmachine = async (req, res) => {
   try {
-    Shift.findOne({machine : req.params.id, datefin :null}, (err, doc) => {
+    Shift.findOne({machine : req.params.id, datefin :null, produit :{$ne : "GHOST"}}, (err, doc) => {
       if (!err) { 
         res.json(doc) }
       else {

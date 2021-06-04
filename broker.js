@@ -29,7 +29,7 @@ exports.connectmqtt = () => {
 
     let topicRecu = topic.slice(12, topic.length);
 
-    let hbreaks = [];
+    // let hbreaks = [];
     if (topicRecu == "counter") {
       if (parseInt(message) < 7 && parseInt(message) != -1 && parseInt(message) != 0) {
         console.log(" Bad counter : ", topic, " - ", parseInt(message))
@@ -38,36 +38,9 @@ exports.connectmqtt = () => {
         const mach = await Machine.findOne({ factory: f, room: r, machine: m });
         if (mach) {
           mongoose.set('useFindAndModify', false);
-          console.log(" ----- table hbreaks :  ",hbreaks);
-          let condition = false;
-          let breakalert = false;
-          hbreaks.forEach(hb => {
-            if (hb.mach == mach) {
-              
-              hb.index++;
-              condition = true;
-              console.log(" hbreak found , mach : ",mach," index after incr : ",hb.index );
-              if (hb.index >= 6) {
-                breakalert = true;
-              }
-            }
-          })
-          console.log(" ----- condition  :  ",condition);
-
-          if (condition == false) {
-            let doc = {
-              machine: mach,
-              index: 1
-            }
-            console.log(" ----- doc to push :  ",doc);
-
-            await hbreaks.push(doc)
-            console.log(" ----- hbreaks:  ",hbreaks);
-
-          }
-          if (breakalert == true) {
-            // check if the machine already in a break
-            const s = await Shift.findOne({ machine: mach._id, datefin: null }).populate('breaks');
+ 
+          const s = await Shift.findOne({ machine: mach._id, datefin: null, produit: { $ne: "GHOST" } }).populate('breaks')
+          if (s) {
             const l = s.breaks.length;
             if (l > 0) {
               const lastbreak = s.breaks[l - 1];
@@ -80,7 +53,7 @@ exports.connectmqtt = () => {
                     breaks: b
                   }
                 };
-                await Shift.findOneAndUpdate({ machine: mach._id, datefin: null }, update, { returnNewDocument: true })
+                await Shift.findOneAndUpdate({ machine: mach._id, datefin: null, produit: { $ne: "GHOST" } }, update, { returnNewDocument: true })
                   .then(async doc => {
                     if (doc) {
                       const res = await b.save();
@@ -113,7 +86,7 @@ exports.connectmqtt = () => {
                   breaks: b
                 }
               };
-              await Shift.findOneAndUpdate({ machine: mach._id, datefin: null }, update, { returnNewDocument: true })
+              await Shift.findOneAndUpdate({ machine: mach._id, datefin: null,produit: { $ne: "GHOST" } }, update, { returnNewDocument: true })
                 .then(async doc => {
                   if (doc) {
                     const res = await b.save();
@@ -133,9 +106,10 @@ exports.connectmqtt = () => {
               sendmsg(topic, stop, options);
 
             }
-
-
+          } else {
+            console.log(" No shift to mark a break");
           }
+
 
         } else {
           console.log(" ---------------Machine not Found :  ", topic)

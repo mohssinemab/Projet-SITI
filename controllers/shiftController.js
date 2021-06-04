@@ -5,6 +5,9 @@ const mongoose = require('mongoose')
 
 exports.addshift = async (req, res) => {
   try {
+    if(req.user.id==null){
+      res.status(400).send(" can't use a null id, maybe an expired token")
+    }
     let sh = new Shift({
       operateur: req.user.id,
       machine: req.body.machine,

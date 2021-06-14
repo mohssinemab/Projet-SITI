@@ -239,34 +239,35 @@ exports.getmachineswithnumberofbreaks = async (req, res) => {
 
         let data = [];
         const machines = await Shift.find().distinct('machine');
-        console.log("machines  : ", machines);
         const x = machines.length - 1;
 
         for (i = 0; i < machines.length; i++) {
             let mach = machines[i];
-            let n = 0;
-            const docs = await Shift.find({ machine: mach }).populate('breaks');
 
-            docs.forEach(s => {
-                console.log("shift  : ", s);
+            if (mach != null) {
 
-                n += s.breaks.length;
+                let n = 0;
+                const docs = await Shift.find({ machine: mach }).populate('breaks');
+
+                docs.forEach(s => {
+                    console.log("shift  : ", s);
+
+                    n += s.breaks.length;
+                    console.log(n);
+                })
                 console.log(n);
-            })
-            console.log(n);
-            let doc = {
-                machine: await Machine.findById(mach),
-                breaks: n
+                let doc = {
+                    machine: await Machine.findById(mach),
+                    breaks: n
+                }
+                console.log(doc);
+                data.push(doc)
             }
-            console.log(doc);
-            data.push(doc)
-            console.log("ssssssssssdaaaaata :", data);
-
             if (i == machines.length - 1) {
-                console.log("--------------daaaaata :", data);
 
                 res.send(data)
             }
+
 
         }
 
@@ -285,13 +286,13 @@ exports.getoperateurstats = async (req, res) => {
     try {
         let stats = [];
 
-        const ids = await Shift.find({ produit: { $ne: "GHOST" }}).distinct('operateur');
+        const ids = await Shift.find({ produit: { $ne: "GHOST" } }).distinct('operateur');
         console.log(ids);
         for (i = 0; i < ids.length; i++) {
             let id = ids[i];
             let sh = await Shift.find({ operateur: id }).populate('breaks').populate('operateur', '_id username name role score')
             let stat = {};
- 
+
             stat.operateur = sh[0].operateur;
 
             stat.nbrshifts = sh.length;
@@ -326,10 +327,10 @@ exports.getoperateurstats = async (req, res) => {
                 }
             })
 
-            if(stat.operateur!=null){
+            if (stat.operateur != null) {
 
-            stats.push(stat)
-        }
+                stats.push(stat)
+            }
             if (i == ids.length - 1) {
 
                 res.send(stats)

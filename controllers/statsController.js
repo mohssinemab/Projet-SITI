@@ -261,7 +261,9 @@ exports.getmachineswithnumberofbreaks = async (req, res) => {
                     breaks: n
                 }
                 console.log(doc);
-                data.push(doc)
+                if (doc.machine != null) {
+                    data.push(doc)
+                }
             }
             if (i == machines.length - 1) {
 

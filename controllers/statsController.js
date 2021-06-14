@@ -188,7 +188,7 @@ exports.getallbreaksbymachine = async (req, res) => {
         const docs = await Shift.find({ machine: id }).populate('breaks');
 
         let brs = [];
-        if (docs.length == 0) { res.send("No shifts for this machine") }
+        if (docs.length == 0) { res.status(404).send("No shifts for this machine") }
         docs.forEach(doc => {
             if (doc.breaks.length > 0) {
                 doc.breaks.forEach(d => {
@@ -196,7 +196,7 @@ exports.getallbreaksbymachine = async (req, res) => {
                 })
             }
         })
-        if (brs.length == 0) { res.send("No breaks for this machine") }
+        if (brs.length == 0) { res.status(404).send("No breaks for this machine") }
         res.send(brs)
     } catch (err) {
         res.status(400).send(err)
